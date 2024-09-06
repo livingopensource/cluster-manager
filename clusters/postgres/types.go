@@ -1,14 +1,18 @@
 package postgres
 
-import "constellation/clusters"
+import (
+	"constellation/clusters"
+
+	"github.com/spf13/viper"
+)
 
 type PostgresImpl struct {
 	kubeconfig string
 }
 
-func NewCluster(config string) *PostgresImpl {
+func NewCluster() *PostgresImpl {
 	return &PostgresImpl{
-		kubeconfig: config,
+		kubeconfig: viper.GetString("postgres_cluster.kubeconfig"),
 	}
 }
 

@@ -7,6 +7,6 @@ import (
 )
 
 func CreatePostgresInstance(w http.ResponseWriter, r *http.Request) {
-	pgInstance := postgres.NewCluster("postgres_cluster")
+	pgInstance := postgres.NewCluster()
 	clusters.CreateResource(pgInstance, clusters.ClusterResource{})
 }
