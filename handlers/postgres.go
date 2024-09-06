@@ -3,6 +3,8 @@ package handlers
 import (
 	"constellation/clusters"
 	"constellation/clusters/postgres"
+	"encoding/json"
+	"io"
 	"log/slog"
 	"net/http"
 )
@@ -10,11 +12,26 @@ import (
 func CreatePostgresInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
 	pgInstance := postgres.NewCluster()
-
-	err := clusters.CreateResource(pgInstance, clusters.ClusterResource{})
+	namespace := r.PathValue("namespace")
+	req, err := io.ReadAll(r.Body)
 	if err != nil {
 		slog.Error(err.Error())
 		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		return
+	}
+	var clusterResource clusters.ClusterResource
+	err = json.Unmarshal(req, &clusterResource)
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		return
+	}
+	clusterResource.Namespace = namespace
+	err = clusters.CreateResource(pgInstance, clusterResource)
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		return
 	}
 	crw.response(http.StatusCreated, "Postgres instance created", nil, nil)
 }
@@ -29,6 +46,7 @@ func GetAllPostgresInstances(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error(err.Error())
 		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		return
 	}
 	crw.response(http.StatusOK, "Postgres instances fetched", instances, nil)
 }
@@ -47,6 +65,7 @@ func GetPostgresInstance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error(err.Error())
 		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		return
 	}
 	crw.response(http.StatusOK, "Postgres instance fetched", instance, nil)
 }
@@ -65,6 +84,7 @@ func DeletePostgresInstance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error(err.Error())
 		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		return
 	}
 	crw.response(http.StatusOK, "Postgres instance deleted", nil, nil)
 }
