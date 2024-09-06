@@ -2,10 +2,10 @@ package clusters
 
 type ClusterImpl interface {
 	Create(resource ClusterResource) error
-	Update(id string, resource ClusterResource) (map[string]interface{}, error)
-	Delete(id string) error
-	Find(id string) (map[string]interface{}, error)
-	FindAll() ([]map[string]interface{}, error)
+	Update(resource ClusterResource) (map[string]interface{}, error)
+	Delete(resource ClusterResource) error
+	Find(resource ClusterResource) (map[string]interface{}, error)
+	FindAll(resource ClusterResource) (map[string]interface{}, error)
 }
 
 func CreateResource(r ClusterImpl, resource ClusterResource) error {
@@ -13,17 +13,17 @@ func CreateResource(r ClusterImpl, resource ClusterResource) error {
 }
 
 func UpdateResource(r ClusterImpl, resource ClusterResource) (map[string]interface{}, error) {
-	return r.Update(resource.ID, resource)
+	return r.Update(resource)
 }
 
 func DeleteResource(r ClusterImpl, resource ClusterResource) error {
-	return r.Delete(resource.ID)
+	return r.Delete(resource)
 }
 
 func FindResource(r ClusterImpl, resource ClusterResource) (map[string]interface{}, error) {
-	return r.Find(resource.ID)
+	return r.Find(resource)
 }
 
-func FindAllResources(r ClusterImpl, resource ClusterResource) ([]map[string]interface{}, error) {
-	return r.FindAll()
+func FindAllResources(r ClusterImpl, resource ClusterResource) (map[string]interface{}, error) {
+	return r.FindAll(resource)
 }

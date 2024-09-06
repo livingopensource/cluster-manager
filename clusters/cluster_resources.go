@@ -1,9 +1,10 @@
 package clusters
 
 type ClusterResource struct {
-	ID      string  `json:"id,omitempty"`
-	Compute Compute `json:"compute"`
-	Account Account `json:"account"`
+	ID        string  `json:"id,omitempty"`
+	Namespace string  `json:"namespace,omitempty"`
+	Compute   Compute `json:"compute"`
+	Account   Account `json:"account"`
 }
 
 type Compute struct {
