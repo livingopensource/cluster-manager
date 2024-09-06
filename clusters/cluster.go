@@ -5,7 +5,7 @@ type ClusterImpl interface {
 	Update(resource ClusterResource) (map[string]interface{}, error)
 	Delete(resource ClusterResource) error
 	Find(resource ClusterResource) (map[string]interface{}, error)
-	FindAll(resource ClusterResource) (map[string]interface{}, error)
+	FindAll(resource ClusterResource) ([]map[string]interface{}, error)
 }
 
 func CreateResource(r ClusterImpl, resource ClusterResource) error {
@@ -24,6 +24,6 @@ func FindResource(r ClusterImpl, resource ClusterResource) (map[string]interface
 	return r.Find(resource)
 }
 
-func FindAllResources(r ClusterImpl, resource ClusterResource) (map[string]interface{}, error) {
+func FindAllResources(r ClusterImpl, resource ClusterResource) ([]map[string]interface{}, error) {
 	return r.FindAll(resource)
 }

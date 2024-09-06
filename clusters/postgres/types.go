@@ -75,11 +75,18 @@ func (c *PostgresImpl) Find(resource clusters.ClusterResource) (map[string]inter
 	return response.Object, err
 }
 
-func (c *PostgresImpl) FindAll(resource clusters.ClusterResource) (map[string]interface{}, error) {
+func (c *PostgresImpl) FindAll(resource clusters.ClusterResource) ([]map[string]interface{}, error) {
 	response, err := clusters.ListResourceSchema(schema.GroupVersionKind{
 		Group:   "postgresql.cnpg.io",
 		Version: "v1",
 		Kind:    "Cluster",
-	}, resource.Compute.Name, c.kubeconfig, resource.Namespace, "postgres")
-	return response.Object, err
+	}, c.kubeconfig, resource.Namespace, "postgres")
+	if err != nil {
+		return nil, err
+	}
+	result := make([]map[string]interface{}, len(response.Items))
+	for i, item := range response.Items {
+		result[i] = item.Object
+	}
+	return result, nil
 }
