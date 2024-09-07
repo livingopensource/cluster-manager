@@ -36,7 +36,7 @@ func (c *PostgresImpl) Create(resource clusters.ClusterResource) error {
 			},
 		},
 	}
-	_, err := clusters.CreateResourceSchema(obj, c.kubeconfig, resource.Namespace, "postgres")
+	_, err := clusters.CreateResourceSchema(obj, c.kubeconfig, resource.Namespace)
 	return err
 }
 
@@ -45,7 +45,7 @@ func (c *PostgresImpl) Delete(resource clusters.ClusterResource) error {
 		Group:   "postgresql.cnpg.io",
 		Version: "v1",
 		Kind:    "Cluster",
-	}, resource.Compute.Name, c.kubeconfig, resource.Namespace, "postgres")
+	}, resource.Compute.Name, c.kubeconfig, resource.Namespace)
 }
 
 func (c *PostgresImpl) Update(resource clusters.ClusterResource) (map[string]interface{}, error) {
@@ -64,7 +64,7 @@ func (c *PostgresImpl) Update(resource clusters.ClusterResource) (map[string]int
 			},
 		},
 	}
-	response, err := clusters.UpdateResourceSchema(obj, c.kubeconfig, resource.Namespace, "postgres")
+	response, err := clusters.UpdateResourceSchema(obj, c.kubeconfig, resource.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *PostgresImpl) Find(resource clusters.ClusterResource) (map[string]inter
 		Group:   "postgresql.cnpg.io",
 		Version: "v1",
 		Kind:    "Cluster",
-	}, resource.Compute.Name, c.kubeconfig, resource.Namespace, "postgres")
+	}, resource.Compute.Name, c.kubeconfig, resource.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *PostgresImpl) FindAll(resource clusters.ClusterResource) ([]map[string]
 		Group:   "postgresql.cnpg.io",
 		Version: "v1",
 		Kind:    "Cluster",
-	}, c.kubeconfig, resource.Namespace, "postgres")
+	}, c.kubeconfig, resource.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *PostgresImpl) Watch(resource clusters.ClusterResource) (watch.Interface
 		Group:   "postgresql.cnpg.io",
 		Version: "v1",
 		Kind:    "Cluster",
-	}, c.kubeconfig, resource.Namespace, "postgres")
+	}, c.kubeconfig, resource.Namespace)
 	if err != nil {
 		return nil, err
 	}

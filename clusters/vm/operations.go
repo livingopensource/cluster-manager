@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/spf13/viper"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 )
 
@@ -23,7 +24,11 @@ func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
 }
 
 func (c *VirtualMachine) Delete(resource clusters.ClusterResource) error {
-	return errors.New("not implemented")
+	return clusters.DeleteResourceSchema(schema.GroupVersionKind{
+		Group:   "kubevirt.io",
+		Version: "v1",
+		Kind:    "VirtualMachine",
+	}, resource.Compute.Name, c.kubeconfig, resource.Namespace)
 }
 
 func (c *VirtualMachine) Patch(resource clusters.ClusterResource) (map[string]interface{}, error) {
@@ -31,15 +36,43 @@ func (c *VirtualMachine) Patch(resource clusters.ClusterResource) (map[string]in
 }
 
 func (c *VirtualMachine) Watch(resource clusters.ClusterResource) (watch.Interface, error) {
-	return nil, errors.New("not implemented")
+	response, err := clusters.WatchResourceSchema(schema.GroupVersionKind{
+		Group:   "kubevirt.io",
+		Version: "v1",
+		Kind:    "VirtualMachine",
+	}, c.kubeconfig, resource.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }
 
 func (c *VirtualMachine) Find(resource clusters.ClusterResource) (map[string]interface{}, error) {
-	return nil, errors.New("not implemented")
+	response, err := clusters.GetResourceSchema(schema.GroupVersionKind{
+		Group:   "kubevirt.io",
+		Version: "v1",
+		Kind:    "VirtualMachine",
+	}, resource.Compute.Name, c.kubeconfig, resource.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	return response.Object, nil
 }
 
 func (c *VirtualMachine) FindAll(resource clusters.ClusterResource) ([]map[string]interface{}, error) {
-	return nil, errors.New("not implemented")
+	response, err := clusters.ListResourceSchema(schema.GroupVersionKind{
+		Group:   "kubevirt.io",
+		Version: "v1",
+		Kind:    "VirtualMachine",
+	}, c.kubeconfig, resource.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]map[string]interface{}, len(response.Items))
+	for i, item := range response.Items {
+		result[i] = item.Object
+	}
+	return result, nil
 }
 
 func (c *VirtualMachine) Update(resource clusters.ClusterResource) (map[string]interface{}, error) {

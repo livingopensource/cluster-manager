@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func CreateResourceSchema(resource *unstructured.Unstructured, config, namespace, service string) (*unstructured.Unstructured, error) {
+func CreateResourceSchema(resource *unstructured.Unstructured, config, namespace string) (*unstructured.Unstructured, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func CreateResourceSchema(resource *unstructured.Unstructured, config, namespace
 	}
 
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func CreateResourceSchema(resource *unstructured.Unstructured, config, namespace
 	return ri.Create(context.TODO(), resource, metav1.CreateOptions{})
 }
 
-func UpdateResourceSchema(resource *unstructured.Unstructured, config, namespace, service string) (*unstructured.Unstructured, error) {
+func UpdateResourceSchema(resource *unstructured.Unstructured, config, namespace string) (*unstructured.Unstructured, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func UpdateResourceSchema(resource *unstructured.Unstructured, config, namespace
 	}
 
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func UpdateResourceSchema(resource *unstructured.Unstructured, config, namespace
 	return ri.Update(context.TODO(), resource, metav1.UpdateOptions{})
 }
 
-func PatchResourceSchema(name, config, namespace, service string, gvk schema.GroupVersionKind, patchData []byte, patchType types.PatchType) (*unstructured.Unstructured, error) {
+func PatchResourceSchema(name, config, namespace string, gvk schema.GroupVersionKind, patchData []byte, patchType types.PatchType) (*unstructured.Unstructured, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func PatchResourceSchema(name, config, namespace, service string, gvk schema.Gro
 	}
 
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func PatchResourceSchema(name, config, namespace, service string, gvk schema.Gro
 	return ri.Patch(context.TODO(), name, patchType, patchData, metav1.PatchOptions{})
 }
 
-func GetResourceSchema(gvk schema.GroupVersionKind, name, config, namespace, service string) (*unstructured.Unstructured, error) {
+func GetResourceSchema(gvk schema.GroupVersionKind, name, config, namespace string) (*unstructured.Unstructured, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func GetResourceSchema(gvk schema.GroupVersionKind, name, config, namespace, ser
 	}
 
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func GetResourceSchema(gvk schema.GroupVersionKind, name, config, namespace, ser
 	return ri.Get(context.TODO(), name, metav1.GetOptions{})
 }
 
-func ListResourceSchema(gvk schema.GroupVersionKind, config, namespace, service string) (*unstructured.UnstructuredList, error) {
+func ListResourceSchema(gvk schema.GroupVersionKind, config, namespace string) (*unstructured.UnstructuredList, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
@@ -172,7 +172,7 @@ func ListResourceSchema(gvk schema.GroupVersionKind, config, namespace, service 
 	}
 
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func ListResourceSchema(gvk schema.GroupVersionKind, config, namespace, service 
 	return ri.List(context.TODO(), metav1.ListOptions{})
 }
 
-func DeleteResourceSchema(gvk schema.GroupVersionKind, name, config, namespace, service string) error {
+func DeleteResourceSchema(gvk schema.GroupVersionKind, name, config, namespace string) error {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return err
@@ -206,7 +206,7 @@ func DeleteResourceSchema(gvk schema.GroupVersionKind, name, config, namespace, 
 	}
 
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return err
 	}
@@ -219,7 +219,7 @@ func DeleteResourceSchema(gvk schema.GroupVersionKind, name, config, namespace, 
 	return ri.Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
-func WatchResourceSchema(gvk schema.GroupVersionKind, config, namespace, service string) (watch.Interface, error) {
+func WatchResourceSchema(gvk schema.GroupVersionKind, config, namespace string) (watch.Interface, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
@@ -238,7 +238,7 @@ func WatchResourceSchema(gvk schema.GroupVersionKind, config, namespace, service
 		return nil, err
 	}
 	var ri dynamic.ResourceInterface
-	dyn, err := k8s.DynamicClientSet(config, service)
+	dyn, err := k8s.DynamicClientSet(config)
 	if err != nil {
 		return nil, err
 	}

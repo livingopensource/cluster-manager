@@ -6,7 +6,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func ClientSet(kubeconfig, service string) (*kubernetes.Clientset, error) {
+func ClientSet(kubeconfig string) (*kubernetes.Clientset, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, err
@@ -14,7 +14,7 @@ func ClientSet(kubeconfig, service string) (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func DynamicClientSet(kubeconfig, service string) (*dynamic.DynamicClient, error) {
+func DynamicClientSet(kubeconfig string) (*dynamic.DynamicClient, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, err
