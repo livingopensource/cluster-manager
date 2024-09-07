@@ -21,12 +21,24 @@ func apiRoutes() *http.ServeMux {
 
 	// MySQL paths
 	mysql := http.NewServeMux()
+	mysql.HandleFunc("POST /{namespace}/instances", handlers.CreateMySQLInstance)
+	mysql.HandleFunc("GET /{namespace}/instances", handlers.GetAllMySQLInstances)
+	mysql.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetMySQLInstance)
+	mysql.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeleteMySQLInstance)
 
 	// Serveless app paths
 	serverless := http.NewServeMux()
+	serverless.HandleFunc("POST /{namespace}/instances", handlers.CreateServerlessInstance)
+	serverless.HandleFunc("GET /{namespace}/instances", handlers.GetAllServerlessInstances)
+	serverless.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetServerlessInstance)
+	serverless.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeleteServerlessInstance)
 
 	// Virtual Machines
 	vm := http.NewServeMux()
+	vm.HandleFunc("POST /{namespace}/instances", handlers.CreateVirtualMachineInstance)
+	vm.HandleFunc("GET /{namespace}/instances", handlers.GetAllVirtualMachineInstances)
+	vm.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetVirtualMachineInstance)
+	vm.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeleteVirtualMachineInstance)
 
 	// Route path subrouting
 	mux.Handle("/clusters/v1/databases/postgres/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1/databases/postgres", postgres).ServeHTTP)))

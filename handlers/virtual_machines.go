@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"constellation/clusters"
-	"constellation/clusters/mysql"
+	"constellation/clusters/vm"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -11,9 +11,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
-func CreateMySQLInstance(w http.ResponseWriter, r *http.Request) {
+func CreateVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
 	req, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -43,7 +43,7 @@ func CreateMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clusterResource.Namespace = namespace
-	err = clusters.CreateResource(mysqlInstance, clusterResource)
+	err = clusters.CreateResource(vmInstance, clusterResource)
 	if err != nil {
 		statusError, isStatus := err.(*errors.StatusError)
 		if isStatus {
@@ -56,14 +56,14 @@ func CreateMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusCreated, "MySQL instance created", nil, nil)
+	crw.response(http.StatusCreated, "VirtualMachine instance created", nil, nil)
 }
 
-func GetAllMySQLInstances(w http.ResponseWriter, r *http.Request) {
+func GetAllVirtualMachineInstances(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
-	instances, err := clusters.FindAllResources(mysqlInstance, clusters.ClusterResource{
+	instances, err := clusters.FindAllResources(vmInstance, clusters.ClusterResource{
 		Namespace: namespace,
 	})
 	if err != nil {
@@ -78,15 +78,15 @@ func GetAllMySQLInstances(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusOK, "MySQL instances fetched", instances, nil)
+	crw.response(http.StatusOK, "VirtualMachine instances fetched", instances, nil)
 }
 
-func GetMySQLInstance(w http.ResponseWriter, r *http.Request) {
+func GetVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
 	name := r.PathValue("name")
-	instance, err := clusters.FindResource(mysqlInstance, clusters.ClusterResource{
+	instance, err := clusters.FindResource(vmInstance, clusters.ClusterResource{
 		Namespace: namespace,
 		Compute: clusters.Compute{
 			Name: name,
@@ -104,15 +104,15 @@ func GetMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusOK, "MySQL instance fetched", instance, nil)
+	crw.response(http.StatusOK, "VirtualMachine instance fetched", instance, nil)
 }
 
-func DeleteMySQLInstance(w http.ResponseWriter, r *http.Request) {
+func DeleteVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
 	name := r.PathValue("name")
-	err := clusters.DeleteResource(mysqlInstance, clusters.ClusterResource{
+	err := clusters.DeleteResource(vmInstance, clusters.ClusterResource{
 		Namespace: namespace,
 		Compute: clusters.Compute{
 			Name: name,
@@ -130,5 +130,5 @@ func DeleteMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusOK, "MySQL instance deleted", nil, nil)
+	crw.response(http.StatusOK, "VirtualMachine instance deleted", nil, nil)
 }

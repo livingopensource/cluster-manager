@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"constellation/clusters"
-	"constellation/clusters/mysql"
+	"constellation/clusters/serverless"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -11,9 +11,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
-func CreateMySQLInstance(w http.ResponseWriter, r *http.Request) {
+func CreateServerlessInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	serverlessInstance := serverless.NewCluster()
 	namespace := r.PathValue("namespace")
 	req, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -43,7 +43,7 @@ func CreateMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clusterResource.Namespace = namespace
-	err = clusters.CreateResource(mysqlInstance, clusterResource)
+	err = clusters.CreateResource(serverlessInstance, clusterResource)
 	if err != nil {
 		statusError, isStatus := err.(*errors.StatusError)
 		if isStatus {
@@ -56,14 +56,14 @@ func CreateMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusCreated, "MySQL instance created", nil, nil)
+	crw.response(http.StatusCreated, "Serveless instance created", nil, nil)
 }
 
-func GetAllMySQLInstances(w http.ResponseWriter, r *http.Request) {
+func GetAllServerlessInstances(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	serverlessInstance := serverless.NewCluster()
 	namespace := r.PathValue("namespace")
-	instances, err := clusters.FindAllResources(mysqlInstance, clusters.ClusterResource{
+	instances, err := clusters.FindAllResources(serverlessInstance, clusters.ClusterResource{
 		Namespace: namespace,
 	})
 	if err != nil {
@@ -78,15 +78,15 @@ func GetAllMySQLInstances(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusOK, "MySQL instances fetched", instances, nil)
+	crw.response(http.StatusOK, "Serveless instances fetched", instances, nil)
 }
 
-func GetMySQLInstance(w http.ResponseWriter, r *http.Request) {
+func GetServerlessInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	serverlessInstance := serverless.NewCluster()
 	namespace := r.PathValue("namespace")
 	name := r.PathValue("name")
-	instance, err := clusters.FindResource(mysqlInstance, clusters.ClusterResource{
+	instance, err := clusters.FindResource(serverlessInstance, clusters.ClusterResource{
 		Namespace: namespace,
 		Compute: clusters.Compute{
 			Name: name,
@@ -104,15 +104,15 @@ func GetMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusOK, "MySQL instance fetched", instance, nil)
+	crw.response(http.StatusOK, "Serveless instance fetched", instance, nil)
 }
 
-func DeleteMySQLInstance(w http.ResponseWriter, r *http.Request) {
+func DeleteServerlessInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	mysqlInstance := mysql.NewCluster()
+	serverlessInstance := serverless.NewCluster()
 	namespace := r.PathValue("namespace")
 	name := r.PathValue("name")
-	err := clusters.DeleteResource(mysqlInstance, clusters.ClusterResource{
+	err := clusters.DeleteResource(serverlessInstance, clusters.ClusterResource{
 		Namespace: namespace,
 		Compute: clusters.Compute{
 			Name: name,
@@ -130,5 +130,5 @@ func DeleteMySQLInstance(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	crw.response(http.StatusOK, "MySQL instance deleted", nil, nil)
+	crw.response(http.StatusOK, "Serveless instance deleted", nil, nil)
 }

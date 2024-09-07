@@ -1,4 +1,4 @@
-package vm
+package mysql
 
 import (
 	"constellation/clusters"
