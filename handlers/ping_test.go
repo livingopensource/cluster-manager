@@ -8,7 +8,7 @@ import (
 )
 
 func TestPing(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/constellation/v1/ping", nil)
+	req := httptest.NewRequest(http.MethodGet, "/clusters/v1/ping", nil)
 
 	recorder := httptest.NewRecorder()
 
@@ -20,7 +20,7 @@ func TestPing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected a nil error, but got %s", err.Error())
 	}
-	want := "pong"
+	want :=  `{"status":200,"message":"pong"}`
 	if string(body) != want {
 		t.Errorf("Expected to get %s, but instead got %s", want, string(body))
 	}
