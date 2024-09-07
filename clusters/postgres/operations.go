@@ -2,10 +2,12 @@ package postgres
 
 import (
 	"constellation/clusters"
+	"errors"
 
 	"github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/watch"
 )
 
 type PostgresImpl struct {
@@ -69,6 +71,10 @@ func (c *PostgresImpl) Update(resource clusters.ClusterResource) (map[string]int
 	return response.Object, err
 }
 
+func (c *PostgresImpl) Patch(resource clusters.ClusterResource) (map[string]interface{}, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (c *PostgresImpl) Find(resource clusters.ClusterResource) (map[string]interface{}, error) {
 	response, err := clusters.GetResourceSchema(schema.GroupVersionKind{
 		Group:   "postgresql.cnpg.io",
@@ -95,4 +101,16 @@ func (c *PostgresImpl) FindAll(resource clusters.ClusterResource) ([]map[string]
 		result[i] = item.Object
 	}
 	return result, nil
+}
+
+func (c *PostgresImpl) Watch(resource clusters.ClusterResource) (watch.Interface, error) {
+	response, err := clusters.WatchResourceSchema(schema.GroupVersionKind{
+		Group:   "postgresql.cnpg.io",
+		Version: "v1",
+		Kind:    "Cluster",
+	}, c.kubeconfig, resource.Namespace, "postgres")
+	if err != nil {
+		return nil, err
+	}
+	return response, err
 }
