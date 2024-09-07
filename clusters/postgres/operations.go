@@ -63,6 +63,9 @@ func (c *PostgresImpl) Update(resource clusters.ClusterResource) (map[string]int
 		},
 	}
 	response, err := clusters.UpdateResourceSchema(obj, c.kubeconfig, resource.Namespace, "postgres")
+	if err != nil {
+		return nil, err
+	}
 	return response.Object, err
 }
 
@@ -72,6 +75,9 @@ func (c *PostgresImpl) Find(resource clusters.ClusterResource) (map[string]inter
 		Version: "v1",
 		Kind:    "Cluster",
 	}, resource.Compute.Name, c.kubeconfig, resource.Namespace, "postgres")
+	if err != nil {
+		return nil, err
+	}
 	return response.Object, err
 }
 

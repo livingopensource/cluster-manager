@@ -10,6 +10,8 @@ func BundleMiddlewares(h http.HandlerFunc, m ...Middleware) http.HandlerFunc {
 	// Always run the log middleware
 	m = append(m, func(next http.HandlerFunc) http.HandlerFunc {
 		return logMiddleware(next).ServeHTTP
+	}, func(next http.HandlerFunc) http.HandlerFunc {
+		return apiHeaders(next).ServeHTTP
 	})
 
 	wrapped := h

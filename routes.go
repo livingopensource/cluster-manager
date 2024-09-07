@@ -8,16 +8,32 @@ import (
 
 func apiRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
-	apiURL := "/clusters/v1"
-	mux.HandleFunc("GET "+apiURL+"/ping", middlewares.BundleMiddlewares(handlers.Ping))
+	ping := http.NewServeMux()
 
-	db := apiURL + "/databases"
-	postgres := db + "/postgres"
-	ns := postgres + "/{namespace}"
-	mux.HandleFunc("POST "+ns, middlewares.BundleMiddlewares(handlers.CreatePostgresInstance))
-	mux.HandleFunc("GET "+ns, middlewares.BundleMiddlewares(handlers.GetAllPostgresInstances))
-	mux.HandleFunc("GET "+ns+"/{name}", middlewares.BundleMiddlewares(handlers.GetPostgresInstance))
-	mux.HandleFunc("DELETE "+ns+"/{name}", middlewares.BundleMiddlewares(handlers.DeletePostgresInstance))
+	ping.HandleFunc("GET /ping", handlers.Ping)
+
+	// Postgres Paths
+	postgres := http.NewServeMux()
+	postgres.HandleFunc("POST /{namespace}/instances", handlers.CreatePostgresInstance)
+	postgres.HandleFunc("GET /{namespace}/instances", handlers.GetAllPostgresInstances)
+	postgres.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetPostgresInstance)
+	postgres.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeletePostgresInstance)
+
+	// MySQL paths
+	mysql := http.NewServeMux()
+
+	// Serveless app paths
+	serverless := http.NewServeMux()
+
+	// Virtual Machines
+	vm := http.NewServeMux()
+
+	// Route path subrouting
+	mux.Handle("/clusters/v1/databases/postgres/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1/databases/postgres", postgres).ServeHTTP)))
+	mux.Handle("/clusters/v1/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1", ping).ServeHTTP)))
+	mux.Handle("/clusters/v1/databases/mysql/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1/databases/mysql", mysql).ServeHTTP)))
+	mux.Handle("/clusters/v1/serverless/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1/serverless", serverless).ServeHTTP)))
+	mux.Handle("/clusters/v1/virtual-machines/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1/virtual-machines", vm).ServeHTTP)))
 
 	return mux
 }

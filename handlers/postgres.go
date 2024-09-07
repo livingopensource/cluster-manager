@@ -7,6 +7,8 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+
+	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 func CreatePostgresInstance(w http.ResponseWriter, r *http.Request) {
@@ -15,22 +17,43 @@ func CreatePostgresInstance(w http.ResponseWriter, r *http.Request) {
 	namespace := r.PathValue("namespace")
 	req, err := io.ReadAll(r.Body)
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	var clusterResource clusters.ClusterResource
 	err = json.Unmarshal(req, &clusterResource)
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	clusterResource.Namespace = namespace
 	err = clusters.CreateResource(pgInstance, clusterResource)
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	crw.response(http.StatusCreated, "Postgres instance created", nil, nil)
@@ -44,8 +67,15 @@ func GetAllPostgresInstances(w http.ResponseWriter, r *http.Request) {
 		Namespace: namespace,
 	})
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	crw.response(http.StatusOK, "Postgres instances fetched", instances, nil)
@@ -63,8 +93,15 @@ func GetPostgresInstance(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	crw.response(http.StatusOK, "Postgres instance fetched", instance, nil)
@@ -82,8 +119,15 @@ func DeletePostgresInstance(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	crw.response(http.StatusOK, "Postgres instance deleted", nil, nil)
