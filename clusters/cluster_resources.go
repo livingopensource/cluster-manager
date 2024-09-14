@@ -10,8 +10,8 @@ type ClusterResource struct {
 type Compute struct {
 	Name      string  `json:"name,omitempty"`
 	CPU       float64 `json:"vcpu,omitempty"`
-	RAM       float64 `json:"ram,omitempty"`
-	Storage   string `json:"storage,omitempty"`
+	RAM       string  `json:"ram,omitempty"`
+	Storage   string  `json:"storage,omitempty"`
 	Instances float64 `json:"instances,omitempty"`
 }
 

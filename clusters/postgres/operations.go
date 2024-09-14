@@ -30,6 +30,18 @@ func (c *PostgresImpl) Create(resource clusters.ClusterResource) error {
 			},
 			"spec": map[string]interface{}{
 				"instances": resource.Compute.Instances,
+				"bootstrap": map[string]interface{}{
+					"initdb": map[string]interface{}{
+						"database": resource.Compute.Name,
+						"owner":    resource.Account.Name,
+					},
+				},
+				"resources": map[string]interface{}{
+					"limits": map[string]interface{}{
+						"cpu":    resource.Compute.CPU,
+						"memory": resource.Compute.RAM,
+					},
+				},
 				"storage": map[string]interface{}{
 					"size": resource.Compute.Storage,
 				},
