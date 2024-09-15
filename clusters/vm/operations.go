@@ -48,11 +48,19 @@ func (c *VirtualMachine) Watch(resource clusters.ClusterResource) (watch.Interfa
 }
 
 func (c *VirtualMachine) Find(resource clusters.ClusterResource) (map[string]interface{}, error) {
-	response, err := clusters.GetResourceSchema(schema.GroupVersionKind{
+	gvk := schema.GroupVersionKind{
 		Group:   "kubevirt.io",
 		Version: "v1",
 		Kind:    "VirtualMachine",
-	}, resource.Compute.Name, c.kubeconfig, resource.Namespace)
+	}
+	if resource.HTTP.QueryParams.Get("state") == "up" {
+		gvk = schema.GroupVersionKind{
+			Group:   "kubevirt.io",
+			Version: "v1",
+			Kind:    "VirtualMachineInstance",
+		}
+	}
+	response, err := clusters.GetResourceSchema(gvk, resource.Compute.Name, c.kubeconfig, resource.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -60,11 +68,19 @@ func (c *VirtualMachine) Find(resource clusters.ClusterResource) (map[string]int
 }
 
 func (c *VirtualMachine) FindAll(resource clusters.ClusterResource) ([]map[string]interface{}, error) {
-	response, err := clusters.ListResourceSchema(schema.GroupVersionKind{
+	gvk := schema.GroupVersionKind{
 		Group:   "kubevirt.io",
 		Version: "v1",
 		Kind:    "VirtualMachine",
-	}, c.kubeconfig, resource.Namespace)
+	}
+	if resource.HTTP.QueryParams.Get("state") == "up" {
+		gvk = schema.GroupVersionKind{
+			Group:   "kubevirt.io",
+			Version: "v1",
+			Kind:    "VirtualMachineInstance",
+		}
+	}
+	response, err := clusters.ListResourceSchema(gvk, c.kubeconfig, resource.Namespace)
 	if err != nil {
 		return nil, err
 	}

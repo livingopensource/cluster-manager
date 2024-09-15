@@ -1,10 +1,13 @@
 package clusters
 
+import "net/url"
+
 type ClusterResource struct {
 	ID        string  `json:"id,omitempty"`
 	Namespace string  `json:"namespace,omitempty"`
-	Compute   Compute `json:"compute"`
-	Account   Account `json:"account"`
+	Compute   Compute `json:"compute,omitempty"`
+	Account   Account `json:"account,omitempty"`
+	HTTP      HTTP    `json:"http,omitempty"`
 }
 
 type Compute struct {
@@ -18,4 +21,8 @@ type Compute struct {
 type Account struct {
 	Name     string `json:"name,omitempty"`
 	Password string `json:"password,omitempty"`
+}
+
+type HTTP struct {
+	QueryParams url.Values `json:"params,omitempty"`
 }

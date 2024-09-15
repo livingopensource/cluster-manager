@@ -63,8 +63,12 @@ func GetAllVirtualMachineInstances(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
 	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
+	params := r.URL.Query()
 	instances, err := clusters.FindAllResources(vmInstance, clusters.ClusterResource{
 		Namespace: namespace,
+		HTTP: clusters.HTTP{
+			QueryParams: params,
+		},
 	})
 	if err != nil {
 		statusError, isStatus := err.(*errors.StatusError)
@@ -86,10 +90,14 @@ func GetVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
 	name := r.PathValue("name")
+	params := r.URL.Query()
 	instance, err := clusters.FindResource(vmInstance, clusters.ClusterResource{
 		Namespace: namespace,
 		Compute: clusters.Compute{
 			Name: name,
+		},
+		HTTP: clusters.HTTP{
+			QueryParams: params,
 		},
 	})
 	if err != nil {
