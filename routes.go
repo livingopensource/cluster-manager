@@ -39,6 +39,7 @@ func apiRoutes() *http.ServeMux {
 	vm.HandleFunc("POST /{namespace}/instances", handlers.CreateVirtualMachineInstance)
 	vm.HandleFunc("GET /{namespace}/instances", handlers.GetAllVirtualMachineInstances)
 	vm.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetVirtualMachineInstance)
+	vm.HandleFunc("GET /{namespace}/instances/watch", handlers.WatchVirtualMachineInstances)
 	vm.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeleteVirtualMachineInstance)
 
 	// Kubernetes native resources API
