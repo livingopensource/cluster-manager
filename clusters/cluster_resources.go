@@ -17,6 +17,8 @@ type Compute struct {
 	Storage   string  `json:"storage,omitempty"`
 	Instances float64 `json:"instances,omitempty"`
 	State     string  `json:"state,omitempty"`
+	SSHKey    string  `json:"ssh_key,omitempty"`
+	URL       string  `json:"url,omitempty"`
 }
 
 type Account struct {

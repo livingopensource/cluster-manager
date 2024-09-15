@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/viper"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
@@ -22,7 +23,102 @@ func NewCluster() *VirtualMachine {
 }
 
 func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
-	return errors.New("not implemented")
+	obj := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "kubevirt.io/v1",
+			"kind":       "VirtualMachine",
+			"metadata": map[string]interface{}{
+				"name": resource.Compute.Name,
+			},
+			"spec": map[string]interface{}{
+				"running": true,
+				"template": map[string]interface{}{
+					"metadata": map[string]interface{}{
+						"labels": map[string]interface{}{
+							"kubevirt.io/vm": resource.Compute.Name,
+						},
+					},
+					"spec": map[string]interface{}{
+						"domain": map[string]interface{}{
+							"cpu": map[string]interface{}{
+								"cores": resource.Compute.CPU,
+							},
+							"devices": map[string]interface{}{
+								"disks": []map[string]interface{}{
+									{
+										"name": "os-disk-" + resource.Compute.Name,
+										"disk": map[string]interface{}{
+											"bus": "virtio",
+										},
+									},
+									{
+										"name": "cloudinitdisk",
+										"cdrom": map[string]interface{}{
+											"bus": "sata",
+										},
+									},
+								},
+							},
+							"resources": map[string]interface{}{
+								"limits": map[string]interface{}{
+									"memory": resource.Compute.RAM,
+								},
+							},
+						},
+						"volumes": []map[string]interface{}{
+							{
+								"name": "os-disk-" + resource.Compute.Name,
+								"dataVolume": map[string]interface{}{
+									"name": "os-volume-disk-" + resource.Compute.Name,
+								},
+							},
+							{
+								"name": "cloudinitdisk",
+								"cloudInitNoCloud": map[string]interface{}{
+									"userData": fmt.Sprintf(`|
+									   #cloud-config
+									   ssh_pwauth: True
+									   disable_root: false
+									   ssh_authorized_keys:
+									     - ssh-rsa %s
+									   `, resource.Compute.SSHKey),
+								},
+							},
+						},
+					},
+				},
+				"dataVolumeTemplates": []map[string]interface{}{
+					{
+						"metadata": map[string]interface{}{
+							"name": "os-volume-disk-" + resource.Compute.Name,
+						},
+						"spec": map[string]interface{}{
+							"storage": map[string]interface{}{
+								"accessModes": []string{
+									"ReadWriteOnce",
+								},
+								"resources": map[string]interface{}{
+									"requests": map[string]interface{}{
+										"storage": resource.Compute.Storage,
+									},
+								},
+							},
+							"source": map[string]interface{}{
+								"http": map[string]interface{}{
+									"url": resource.Compute.URL,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	_, err := clusters.CreateResourceSchema(obj, c.kubeconfig, resource.Namespace)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *VirtualMachine) Delete(resource clusters.ClusterResource) error {
