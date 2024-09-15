@@ -16,6 +16,7 @@ type Compute struct {
 	RAM       string  `json:"ram,omitempty"`
 	Storage   string  `json:"storage,omitempty"`
 	Instances float64 `json:"instances,omitempty"`
+	State     string  `json:"state,omitempty"`
 }
 
 type Account struct {

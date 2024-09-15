@@ -116,6 +116,27 @@ func GetVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	crw.response(http.StatusOK, "VirtualMachine instance fetched", instance, nil)
 }
 
+func PatchVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
+	crw := customResponseWriter{w: w}
+	vmInstance := vm.NewCluster()
+	namespace := r.PathValue("namespace")
+	var clusterResource clusters.ClusterResource
+	err := json.NewDecoder(r.Body).Decode(&clusterResource)
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusInternalServerError, err.Error(), nil, nil)
+		return
+	}
+	clusterResource.Namespace = namespace
+	response, err := vmInstance.Patch(clusterResource)
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusInternalServerError, err.Error(), nil, nil)
+		return
+	}
+	crw.response(http.StatusAccepted, "ok", response, nil)
+}
+
 func DeleteVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
 	vmInstance := vm.NewCluster()
