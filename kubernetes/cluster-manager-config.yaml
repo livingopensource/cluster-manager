@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-manager-config
+data:
+  config.ini: |
+    PORT=3000
+    [POSTGRES_CLUSTER]
+    KUBECONFIG=/src/app/dev.yaml
+    [MYSQL_CLUSTER]
+    KUBECONFIG=/src/app/dev.yaml
+    [VIRTUAL_MACHINES]
+    KUBECONFIG=/src/app/dev.yaml

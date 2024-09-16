@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swiftcloud-cluster-manager
+spec:
+  selector:
+    matchLabels:
+      app: swiftcloud
+      component: cluster-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: swiftcloud
+        component: cluster-manager
+    spec:
+      imagePullSecrets:
+        - name: app-registry
+      containers:
+        - name: cluster-manager
+          imagePullPolicy: IfNotPresent
+          image: containers.osystems.africa/swiftcloud/constellation:v0.0.1-dev
+          volumeMounts:
+            - mountPath: "/src/app/config.ini"
+              subPath: config.ini
+              name: swiftcloud-constellation-volume
+            - mountPath: "/src/app/dev.yaml"
+              subPath: dev.yaml
+              name: swiftcloud-dev-cluster-volume
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+      volumes:
+        - name: swiftcloud-constellation-volume
+          configMap:
+            name: cluster-manager-config
+        - name: swiftcloud-dev-cluster-volume
+          configMap:
+            name: dev-cluster-access-config
