@@ -75,13 +75,14 @@ func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
 							{
 								"name": "cloudinitdisk",
 								"cloudInitNoCloud": map[string]interface{}{
-									"userData": fmt.Sprintf(`|
+									"userData": fmt.Sprintf(`
 									   #cloud-config
 									   ssh_pwauth: True
 									   disable_root: false
+									   password: %s
 									   ssh_authorized_keys:
 									     - ssh-rsa %s
-									   `, resource.Compute.SSHKey),
+									   `, resource.Account.Password, resource.Compute.SSHKey),
 								},
 							},
 						},
