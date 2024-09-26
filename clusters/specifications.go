@@ -151,6 +151,40 @@ func GetResourceSchema(gvk schema.GroupVersionKind, name, config, namespace stri
 	return ri.Get(context.TODO(), name, metav1.GetOptions{})
 }
 
+func GetWithSubResourceSchema(gvk schema.GroupVersionKind, name, config, namespace string, subresources... string) (*unstructured.Unstructured, error) {
+	cfg, err := clientcmd.BuildConfigFromFlags("", config)
+	if err != nil {
+		return nil, err
+	}
+	dc, err := discovery.NewDiscoveryClientForConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+	gr, err := restmapper.GetAPIGroupResources(dc)
+	if err != nil {
+		return nil, err
+	}
+
+	rm := restmapper.NewDiscoveryRESTMapper(gr)
+	mapping, err := rm.RESTMapping(gvk.GroupKind(), gvk.Version)
+	if err != nil {
+		return nil, err
+	}
+
+	var ri dynamic.ResourceInterface
+	dyn, err := k8s.DynamicClientSet(config)
+	if err != nil {
+		return nil, err
+	}
+	if mapping.Scope.Name() == meta.RESTScopeNameRoot {
+		ri = dyn.Resource(mapping.Resource)
+	} else {
+		ri = dyn.Resource(mapping.Resource).Namespace(namespace)
+	}
+
+	return ri.Get(context.TODO(), name, metav1.GetOptions{}, subresources...)
+}
+
 func ListResourceSchema(gvk schema.GroupVersionKind, config, namespace string) (*unstructured.UnstructuredList, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {

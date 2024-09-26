@@ -90,6 +90,8 @@ func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
 				},
 				"dataVolumeTemplates": []map[string]interface{}{
 					{
+						"apiVersion": "cdi.kubevirt.io/v1beta1",
+						"kind": "DataVolume",
 						"metadata": map[string]interface{}{
 							"name": "os-volume-disk-" + resource.Compute.Name,
 						},
