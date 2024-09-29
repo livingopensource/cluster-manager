@@ -48,6 +48,7 @@ func apiRoutes() *http.ServeMux {
 	k8s.HandleFunc("GET /{namespace}/pods", handlers.GetPods)
 	k8s.HandleFunc("GET /{namespace}/secrets", handlers.GetSecrets)
 	k8s.HandleFunc("GET /{namespace}/configmaps", handlers.GetConfigMaps)
+	k8s.HandleFunc("POST /{namespace}/tokens/{service_account}", handlers.CreateToken)
 
 	// Route path subrouting
 	mux.Handle("/clusters/v1/databases/postgres/", middlewares.BundleMiddlewares(http.HandlerFunc(http.StripPrefix("/clusters/v1/databases/postgres", postgres).ServeHTTP)))

@@ -33,3 +33,17 @@ func GetSecrets(w http.ResponseWriter, r *http.Request) {
 func GetPods(w http.ResponseWriter, r *http.Request) {}
 
 func GetConfigMaps(w http.ResponseWriter, r *http.Request) {}
+
+func CreateToken(w http.ResponseWriter, r *http.Request) {
+	crw := customResponseWriter{w: w}
+	resource := k8s.NewCoreAPIResource()
+	namespace := r.PathValue("namespace")
+	serviceAccount := r.PathValue("service_account")
+	token, err := resource.CreateToken(namespace, serviceAccount)
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusInternalServerError, "error", nil, nil)
+		return
+	}
+	crw.response(http.StatusOK, "ok", token, nil)
+}
