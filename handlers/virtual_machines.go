@@ -184,8 +184,15 @@ func WatchVirtualMachineInstances(w http.ResponseWriter, r *http.Request) {
 		Namespace: namespace,
 	})
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusInternalServerError, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 	defer watcher.Stop()
@@ -231,8 +238,15 @@ func VNCVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		slog.Error(err.Error())
-		crw.response(http.StatusInternalServerError, err.Error(), nil, nil)
+		statusError, isStatus := err.(*errors.StatusError)
+		if isStatus {
+			errCode := statusError.Status().Code
+			slog.Error("Kubernetes error", "code", errCode, "message", err.Error())
+			crw.response(int(errCode), err.Error(), nil, nil)
+		} else {
+			slog.Error("Unknown error", "message", err.Error())
+			crw.response(http.StatusUnprocessableEntity, err.Error(), nil, nil)
+		}
 		return
 	}
 
@@ -244,12 +258,12 @@ func VNCVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				slog.Error("Error reading from websocket: "+ err.Error())
+				slog.Error("Error reading from websocket: " + err.Error())
 				break
 			}
 			_, err = vmiConn.Write(message)
 			if err != nil {
-				slog.Error("Error writing to VMI console: n"+ err.Error())
+				slog.Error("Error writing to VMI console: n" + err.Error())
 				break
 			}
 		}
@@ -259,12 +273,12 @@ func VNCVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 	for {
 		n, err := vmiConn.Read(buf)
 		if err != nil {
-			slog.Error("Error reading from VMI console: "+ err.Error())
+			slog.Error("Error reading from VMI console: " + err.Error())
 			break
 		}
 		err = conn.WriteMessage(websocket.BinaryMessage, buf[:n])
 		if err != nil {
-			slog.Error("Error writing to websocket: "+ err.Error())
+			slog.Error("Error writing to websocket: " + err.Error())
 			break
 		}
 	}
