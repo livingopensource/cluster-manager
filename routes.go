@@ -40,6 +40,7 @@ func apiRoutes() *http.ServeMux {
 	vm.HandleFunc("GET /{namespace}/instances", handlers.GetAllVirtualMachineInstances)
 	vm.HandleFunc("PATCH /{namespace}/instances", handlers.PatchVirtualMachineInstance)
 	vm.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetVirtualMachineInstance)
+	vm.HandleFunc("GET /{namespace}/instances/{name}/vnc", handlers.VNCVirtualMachineInstance)
 	vm.HandleFunc("GET /{namespace}/instances/watch", handlers.WatchVirtualMachineInstances)
 	vm.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeleteVirtualMachineInstance)
 

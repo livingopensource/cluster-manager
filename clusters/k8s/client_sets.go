@@ -3,13 +3,8 @@ package k8s
 import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
-
-func RestConfig(kubeconfig string) (*rest.Config, error) {
-	return clientcmd.BuildConfigFromFlags("", kubeconfig)
-}
 
 func ClientSet(kubeconfig string) (*kubernetes.Clientset, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)

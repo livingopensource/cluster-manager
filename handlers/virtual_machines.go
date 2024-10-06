@@ -165,7 +165,7 @@ func DeleteVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
 
 func WatchVirtualMachineInstances(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	pgInstance := vm.NewCluster()
+	vmInstance := vm.NewCluster()
 	namespace := r.PathValue("namespace")
 	// Upgrade HTTP connection to WebSocket
 	upgrader := websocket.Upgrader{
@@ -180,7 +180,7 @@ func WatchVirtualMachineInstances(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	watcher, err := pgInstance.Watch(clusters.ClusterResource{
+	watcher, err := vmInstance.Watch(clusters.ClusterResource{
 		Namespace: namespace,
 	})
 	if err != nil {
@@ -202,4 +202,71 @@ func WatchVirtualMachineInstances(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+}
+
+func VNCVirtualMachineInstance(w http.ResponseWriter, r *http.Request) {
+	crw := customResponseWriter{w: w}
+	vmInstance := vm.NewCluster()
+	namespace := r.PathValue("namespace")
+	name := r.PathValue("name")
+
+	// Upgrade HTTP connection to WebSocket
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusInternalServerError, err.Error(), nil, nil)
+		return
+	}
+
+	stream, err := vmInstance.VNC(clusters.ClusterResource{
+		Namespace: namespace,
+		Compute: clusters.Compute{
+			Name: name,
+		},
+	})
+
+	if err != nil {
+		slog.Error(err.Error())
+		crw.response(http.StatusInternalServerError, err.Error(), nil, nil)
+		return
+	}
+
+	defer stream.AsConn().Close()
+
+	vmiConn := stream.AsConn()
+	// Start copying data between WebSocket and VMI console
+	go func() {
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				slog.Error("Error reading from websocket: "+ err.Error())
+				break
+			}
+			_, err = vmiConn.Write(message)
+			if err != nil {
+				slog.Error("Error writing to VMI console: n"+ err.Error())
+				break
+			}
+		}
+	}()
+
+	buf := make([]byte, 1024)
+	for {
+		n, err := vmiConn.Read(buf)
+		if err != nil {
+			slog.Error("Error reading from VMI console: "+ err.Error())
+			break
+		}
+		err = conn.WriteMessage(websocket.BinaryMessage, buf[:n])
+		if err != nil {
+			slog.Error("Error writing to websocket: "+ err.Error())
+			break
+		}
+	}
+
 }

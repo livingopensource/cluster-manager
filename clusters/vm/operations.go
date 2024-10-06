@@ -10,7 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
-	"kubevirt.io/client-go/kubecli"
+	kvV1 "kubevirt.io/client-go/generated/kubevirt/clientset/versioned/typed/core/v1"
 )
 
 type VirtualMachine struct {
@@ -218,10 +218,10 @@ func (c *VirtualMachine) Update(resource clusters.ClusterResource) (map[string]i
 	return nil, errors.New("not implemented")
 }
 
-func (c *VirtualMachine) VNC(resource clusters.ClusterResource) error {
-	_, err := kubecli.GetKubevirtClientFromClientConfig(c.kubeconfig)
+func (c *VirtualMachine) VNC(resource clusters.ClusterResource) (kvV1.StreamInterface, error) {
+	kubevirt, err := clusters.KubevirtResourceSchema(c.kubeconfig)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return kubevirt.VirtualMachineInstance(resource.Namespace).VNC(resource.Compute.Name)
 }

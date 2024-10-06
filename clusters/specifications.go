@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
+	"kubevirt.io/client-go/kubecli"
 )
 
 func CreateResourceSchema(resource *unstructured.Unstructured, config, namespace string) (*unstructured.Unstructured, error) {
@@ -282,4 +283,12 @@ func WatchResourceSchema(gvk schema.GroupVersionKind, config, namespace string) 
 		ri = dyn.Resource(mapping.Resource).Namespace(namespace)
 	}
 	return ri.Watch(context.TODO(), metav1.ListOptions{})
+}
+
+func KubevirtResourceSchema(config string) (kubecli.KubevirtClient, error) {
+	cfg, err := clientcmd.BuildConfigFromFlags("", config)
+	if err != nil {
+		return nil, err
+	}
+	return kubecli.GetKubevirtClientFromRESTConfig(cfg)
 }
