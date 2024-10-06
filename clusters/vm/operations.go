@@ -2,6 +2,7 @@ package vm
 
 import (
 	"constellation/clusters"
+	"encoding/base64"
 	"errors"
 	"fmt"
 
@@ -24,6 +25,21 @@ func NewCluster() *VirtualMachine {
 }
 
 func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
+	name := resource.Account.Name
+	passwd := resource.Account.Password
+	cloudInitConfig := fmt.Sprintf(`#cloud-config
+users:
+  - name: %s
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users
+    home: /home/%s
+    shell: /bin/bash
+    lock_passwd: false
+chpasswd:
+  list: |
+    %s:%s
+  expire: False`, name, name, name, passwd)
+	cloudInitBase64 := base64.StdEncoding.EncodeToString([]byte(cloudInitConfig))
 	obj := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": "kubevirt.io/v1",
@@ -76,14 +92,7 @@ func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
 							{
 								"name": "cloudinitdisk",
 								"cloudInitNoCloud": map[string]interface{}{
-									"userData": fmt.Sprintf(`
-									   #cloud-config
-									   ssh_pwauth: True
-									   disable_root: false
-									   password: %s
-									   ssh_authorized_keys:
-									     - ssh-rsa %s
-									   `, resource.Account.Password, resource.Compute.SSHKey),
+									"userDataBase64": cloudInitBase64,
 								},
 							},
 						},
