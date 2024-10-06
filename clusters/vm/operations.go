@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
+	"kubevirt.io/client-go/kubecli"
 )
 
 type VirtualMachine struct {
@@ -91,7 +92,7 @@ func (c *VirtualMachine) Create(resource clusters.ClusterResource) error {
 				"dataVolumeTemplates": []map[string]interface{}{
 					{
 						"apiVersion": "cdi.kubevirt.io/v1beta1",
-						"kind": "DataVolume",
+						"kind":       "DataVolume",
 						"metadata": map[string]interface{}{
 							"name": "os-volume-disk-" + resource.Compute.Name,
 						},
@@ -215,4 +216,12 @@ func (c *VirtualMachine) FindAll(resource clusters.ClusterResource) ([]map[strin
 
 func (c *VirtualMachine) Update(resource clusters.ClusterResource) (map[string]interface{}, error) {
 	return nil, errors.New("not implemented")
+}
+
+func (c *VirtualMachine) VNC(resource clusters.ClusterResource) error {
+	_, err := kubecli.GetKubevirtClientFromClientConfig(c.kubeconfig)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -13,10 +13,10 @@ type Resource struct {
 	kubeconfig string
 }
 
-// NewCoreAPIResource returns a new instance of the CoreAPIResource struct.
+// NewSwiftCoreAPIResource returns a new instance of the CoreAPIResource struct.
 // The variadic clusters variable is used to specify the cluster to use. Eventhough the 
 // function can take multiple clusters, only the first one is used.
-func NewCoreAPIResource(clusters ...string) *Resource {
+func NewSwiftCoreAPIResource(clusters ...string) *Resource {
 	var cluster string
 	if len(clusters) > 0 {
 		cluster = clusters[0]

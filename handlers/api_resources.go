@@ -8,7 +8,7 @@ import (
 
 func GetSecrets(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	resource := k8s.NewCoreAPIResource()
+	resource := k8s.NewSwiftCoreAPIResource()
 	namespace := r.PathValue("namespace")
 	secrets, err := resource.Secrets(namespace)
 	if err != nil {
@@ -36,7 +36,7 @@ func GetConfigMaps(w http.ResponseWriter, r *http.Request) {}
 
 func CreateToken(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	resource := k8s.NewCoreAPIResource()
+	resource := k8s.NewSwiftCoreAPIResource()
 	namespace := r.PathValue("namespace")
 	serviceAccount := r.PathValue("service_account")
 	token, err := resource.CreateToken(namespace, serviceAccount)

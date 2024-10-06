@@ -151,7 +151,7 @@ func GetResourceSchema(gvk schema.GroupVersionKind, name, config, namespace stri
 	return ri.Get(context.TODO(), name, metav1.GetOptions{})
 }
 
-func GetWithSubResourceSchema(gvk schema.GroupVersionKind, name, config, namespace string, subresources... string) (*unstructured.Unstructured, error) {
+func GetWithSubResourceSchema(gvk schema.GroupVersionKind, name, config, namespace string, subresources ...string) (*unstructured.Unstructured, error) {
 	cfg, err := clientcmd.BuildConfigFromFlags("", config)
 	if err != nil {
 		return nil, err
