@@ -3,6 +3,7 @@ package serverless
 import (
 	"constellation/clusters"
 	"errors"
+	"fmt"
 
 	"github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -21,6 +22,7 @@ func NewCluster() *Serverless {
 }
 
 func (c *Serverless) Create(resource clusters.ClusterResource) error {
+	containers := resource.Compute.Container
 	obj := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": "serving.knative.dev/v1",
@@ -33,13 +35,11 @@ func (c *Serverless) Create(resource clusters.ClusterResource) error {
 					"metadata": map[string]interface{}{
 						"annotations": map[string]interface{}{
 							"autoscaling.knative.dev/min-scale": "0",
-							"autoscaling.knative.dev/max-scale": resource.Compute.Instances,
+							"autoscaling.knative.dev/max-scale": fmt.Sprintf("%0.f", resource.Compute.Instances),
 						},
 					},
 					"spec": map[string]interface{}{
-						"containers": map[string]interface{}{
-							"image": resource.Compute.URL,
-						},
+						"containers": containers,
 					},
 				},
 			},
