@@ -137,7 +137,7 @@ func DeleteServerlessInstance(w http.ResponseWriter, r *http.Request) {
 
 func WatchServerlessInstances(w http.ResponseWriter, r *http.Request) {
 	crw := customResponseWriter{w: w}
-	serverlessInstance := vm.NewCluster()
+	serverlessInstance := serverless.NewCluster()
 	namespace := r.PathValue("namespace")
 	// Upgrade HTTP connection to WebSocket
 	upgrader := websocket.Upgrader{
