@@ -19,7 +19,7 @@ spec:
       containers:
         - name: cluster-manager
           imagePullPolicy: IfNotPresent
-          image: containers.osystems.africa/swiftcloud/constellation:v0.0.4-dev
+          image: containers.osystems.africa/swiftcloud/constellation:v0.0.5-dev
           volumeMounts:
             - mountPath: "/src/app/config.ini"
               subPath: config.ini

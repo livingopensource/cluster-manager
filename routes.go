@@ -32,6 +32,7 @@ func apiRoutes() *http.ServeMux {
 	serverless.HandleFunc("POST /{namespace}/instances", handlers.CreateServerlessInstance)
 	serverless.HandleFunc("GET /{namespace}/instances", handlers.GetAllServerlessInstances)
 	serverless.HandleFunc("GET /{namespace}/instances/{name}", handlers.GetServerlessInstance)
+	serverless.HandleFunc("GET /{namespace}/instances/watch", handlers.WatchServerlessInstances)
 	serverless.HandleFunc("DELETE /{namespace}/instances/{name}", handlers.DeleteServerlessInstance)
 
 	// Virtual Machines
