@@ -108,7 +108,7 @@ chpasswd:
 						"spec": map[string]interface{}{
 							"storage": map[string]interface{}{
 								"accessModes": []string{
-									"ReadWriteOnce",
+									"ReadWriteMany",
 								},
 								"resources": map[string]interface{}{
 									"requests": map[string]interface{}{
