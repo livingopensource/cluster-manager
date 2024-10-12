@@ -2,6 +2,7 @@ package vm
 
 import (
 	"constellation/clusters"
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -9,8 +10,8 @@ import (
 	"github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
+	kv1 "kubevirt.io/api/core/v1"
 	kvV1 "kubevirt.io/client-go/generated/kubevirt/clientset/versioned/typed/core/v1"
 )
 
@@ -38,7 +39,8 @@ users:
 chpasswd:
   list: |
     %s:%s
-  expire: False`, name, name, name, passwd)
+	root:%s
+  expire: False`, name, name, name, passwd, passwd)
 	cloudInitBase64 := base64.StdEncoding.EncodeToString([]byte(cloudInitConfig))
 	obj := &unstructured.Unstructured{
 		Object: map[string]interface{}{
@@ -48,7 +50,7 @@ chpasswd:
 				"name": resource.Compute.Name,
 			},
 			"spec": map[string]interface{}{
-				"running": true,
+				"runStrategy": "RerunOnFailure",
 				"template": map[string]interface{}{
 					"metadata": map[string]interface{}{
 						"labels": map[string]interface{}{
@@ -156,15 +158,16 @@ func (c *VirtualMachine) Patch(resource clusters.ClusterResource) (map[string]in
 	if err != nil {
 		return nil, err
 	}
-	response, err := clusters.PatchResourceSchema(resource.Compute.Name, c.kubeconfig, resource.Namespace, schema.GroupVersionKind{
-		Group:   "kubevirt.io",
-		Version: "v1",
-		Kind:    "VirtualMachine",
-	}, []byte(fmt.Sprintf(`{"spec":{"running":%t}}`, running)), types.MergePatchType)
-	if err != nil {
-		return nil, err
+	kubevirt, err := clusters.KubevirtResourceSchema(c.kubeconfig)
+	if running {
+		if err != nil {
+			return map[string]interface{}{}, err
+		}
+		err = kubevirt.VirtualMachine(resource.Namespace).Start(context.Background(), resource.Compute.Name, &kv1.StartOptions{})
+	} else {
+		err = kubevirt.VirtualMachine(resource.Namespace).Stop(context.Background(), resource.Compute.Name, &kv1.StopOptions{})
 	}
-	return response.Object, nil
+	return map[string]interface{}{}, err
 }
 
 func (c *VirtualMachine) Watch(resource clusters.ClusterResource) (watch.Interface, error) {
