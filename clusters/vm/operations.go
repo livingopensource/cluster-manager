@@ -39,8 +39,7 @@ users:
 chpasswd:
   list: |
     %s:%s
-	root:%s
-  expire: False`, name, name, name, passwd, passwd)
+  expire: False`, name, name, name, passwd)
 	cloudInitBase64 := base64.StdEncoding.EncodeToString([]byte(cloudInitConfig))
 	obj := &unstructured.Unstructured{
 		Object: map[string]interface{}{
@@ -77,11 +76,23 @@ chpasswd:
 										},
 									},
 								},
+								"interfaces": []map[string]interface{}{
+									{
+										"name":       "default",
+										"masquerade": map[string]interface{}{},
+									},
+								},
 							},
 							"resources": map[string]interface{}{
 								"limits": map[string]interface{}{
 									"memory": resource.Compute.RAM,
 								},
+							},
+						},
+						"networks": []map[string]interface{}{
+							{
+								"name": "default",
+								"pod":  map[string]interface{}{},
 							},
 						},
 						"volumes": []map[string]interface{}{
