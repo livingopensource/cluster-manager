@@ -19,7 +19,7 @@ spec:
       containers:
         - name: cluster-manager
           imagePullPolicy: IfNotPresent
-          image: containers.osystems.africa/swiftcloud/constellation:v0.0.9-dev
+          image: containers.osystems.africa/swiftcloud/constellation:v0.0.10-dev
           volumeMounts:
             - mountPath: "/src/app/config.ini"
               subPath: config.ini
@@ -27,6 +27,9 @@ spec:
             - mountPath: "/src/app/dev.yaml"
               subPath: dev.yaml
               name: swiftcloud-dev-cluster-volume
+            - mountPath: "/src/app/swift-knative.yaml"
+              subPath: swift-knative.yaml
+              name: swiftcloud-knative-cluster-volume
           resources:
             requests:
               memory: "1Gi"
@@ -41,3 +44,6 @@ spec:
         - name: swiftcloud-dev-cluster-volume
           configMap:
             name: dev-cluster-access-config
+        - name: swiftcloud-knative-cluster-volume
+          configMap:
+            name: knative-cluster-access-config
