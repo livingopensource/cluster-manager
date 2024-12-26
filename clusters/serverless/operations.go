@@ -100,3 +100,7 @@ func (c *Serverless) FindAll(resource clusters.ClusterResource) ([]map[string]in
 func (c *Serverless) Update(resource clusters.ClusterResource) (map[string]interface{}, error) {
 	return nil, errors.New("not implemented")
 }
+
+func (c *Serverless) Logs(resource clusters.ClusterResource) (watch.Interface, error) {
+	return nil, errors.New("not implemented")
+}

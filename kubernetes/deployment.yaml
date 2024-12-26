@@ -30,6 +30,9 @@ spec:
             - mountPath: "/src/app/swift-knative.yaml"
               subPath: swift-knative.yaml
               name: swiftcloud-knative-cluster-volume
+            - mountPath: "/src/app/postgres.yaml"
+              subPath: postgres.yaml
+              name: swiftcloud-postgresql-cluster-access-volume
           resources:
             requests:
               memory: "1Gi"
@@ -47,3 +50,6 @@ spec:
         - name: swiftcloud-knative-cluster-volume
           configMap:
             name: knative-cluster-access-config
+        - name: swiftcloud-postgresql-cluster-access-volume
+          configMap:
+            name: postgresql-cluster-access-config
